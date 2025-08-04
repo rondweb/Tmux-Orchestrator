@@ -1,0 +1,111 @@
+Development Plan: Migrating Tmux-Orchestrator to Multi-LLM Support
+Goal
+To refactor the Tmux-Orchestrator codebase to replace direct Claude API calls with a modular, configurable system that can utilize various Large Language Models (LLMs) via their respective APIs or through an abstraction layer like LiteLLM.
+
+Phase 1: Analysis & Setup (Weeks 1-2)
+This phase focuses on understanding the existing codebase and preparing the development environment for the migration.
+
+1.1 Codebase Audit:
+
+Identify all scripts and functions responsible for interacting with the Claude API. This will likely involve examining shell scripts (e.g., send-claude-message.sh) and any Python modules that handle API requests and response parsing.
+
+Map out the flow of information: how the master agent's prompt is generated, how messages are sent to Claude, and how the responses are received and processed by the orchestrator.
+
+1.2 API Research:
+
+Research and understand the API specifications for Gemini, Qwen, and LiteLLM. Note the differences in:
+
+Authentication: API key locations, environment variables.
+
+Request Format: How prompts are structured (e.g., system prompts, user messages).
+
+Response Payload: How the model's response is returned (e.g., JSON structure, text content location).
+
+Endpoint URLs: The specific URLs for sending requests.
+
+1.3 Environment Preparation:
+
+Install necessary libraries, such as the LiteLLM library (pip install litellm) and the official Python SDKs for Gemini and/or Qwen if needed.
+
+Set up a new Git branch specifically for this migration to avoid disrupting the main branch.
+
+Create a dedicated virtual environment for the project.
+
+Phase 2: Core Implementation & Refactoring (Weeks 3-5)
+This is the main development phase where the core logic will be implemented to support multiple LLMs.
+
+2.1 Create a Unified Configuration System:
+
+Introduce a new configuration file (e.g., config.yaml) to centralize all LLM-related settings. This file should be easy to read and modify.
+
+The configuration should specify the following for each LLM:
+
+active_model: The name of the LLM to use (gemini, qwen, litellm).
+
+api_key: The API key, which should be loaded from an environment variable for security.
+
+model_name: The specific model to call (e.g., gemini-1.5-pro, qwen-turbo).
+
+Any other necessary parameters (e.g., base URL).
+
+2.2 Develop an LLM Abstraction Layer:
+
+Create a new Python module, such as llm_handler.py. This module will serve as the single point of entry for all LLM communication.
+
+Define a main function, for example, send_message(agent_name, prompt). This function will read the active_model from the configuration and route the request to the appropriate sub-function.
+
+Implement specific functions for each LLM within this module:
+
+_send_gemini_message(prompt): Handles formatting the request for the Gemini API.
+
+_send_qwen_message(prompt): Handles formatting for the Qwen API.
+
+_send_litellm_message(prompt): This is a key part. LiteLLM provides a single, unified interface. This function will simply pass the prompt and the model_name (from the config) to the LiteLLM library, which will handle the specific API call. This is the most flexible and recommended approach.
+
+2.3 Refactor Existing Scripts:
+
+Modify the original shell scripts (send-claude-message.sh) to remove all hardcoded API calls.
+
+Change these scripts to call the new llm_handler.py module with the required prompt and agent_name as arguments.
+
+The scripts should no longer contain any LLM-specific logic.
+
+Phase 3: Testing & Optimization (Weeks 6-7)
+This phase ensures the new system is robust, stable, and delivers the intended functionality.
+
+3.1 Unit Testing:
+
+Write unit tests for the llm_handler.py module to verify that it correctly sends and receives messages from each supported LLM. Use mocked API calls to ensure tests are fast and reliable without incurring costs.
+
+3.2 End-to-End Testing:
+
+Run the full Tmux-Orchestrator system with each LLM configured in the config.yaml file.
+
+Verify that agents can be created, communicate with the LLM, and successfully execute a test task from start to finish.
+
+Check for stability, error handling, and performance.
+
+3.3 Prompt and Agent Tuning:
+
+The prompts designed for Claude may not work optimally for Gemini or Qwen. Adjust the agent instructions to leverage the strengths and specific nuances of each new LLM.
+
+For example, you might need to change the tone or structure of the "system message" or "persona" prompts to get better results from Gemini's or Qwen's instruction-following capabilities.
+
+Phase 4: Documentation & Finalization (Week 8)
+This final phase prepares the project for release and ensures it is easy for other developers to use.
+
+4.1 Update the README:
+
+Provide clear, step-by-step instructions on how to configure and run the orchestrator with different LLMs.
+
+Explain the purpose of the new config.yaml file and how to fill it out.
+
+Detail how to set up environment variables for API keys securely.
+
+4.2 Final Code Cleanup:
+
+Remove any deprecated or unused Claude-specific code.
+
+Review the code for comments, variable names, and overall clarity.
+
+Merge the new branch into the main repository once all testing is complete and the documentation is updated.
