@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Anotações de Livros</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css">
+  <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+  <section class="section">
+    <div class="container">
+      <h1 class="title">
+        Minhas Anotações de Livros
+      </h1>
+      <p class="subtitle">
+        Adicione e visualize seus comentários de leitura.
+      </p>
+
+      <!-- Formulário de Nova Anotação -->
+      <div class="box">
+        <h2 class="title is-4">Nova Anotação</h2>
+        <form action="/anotacoes/" method="post">
+          <div class="field">
+            <label class="label">Título do Livro</label>
+            <div class="control">
+              <input class="input" type="text" name="titulo_livro" placeholder="Ex: Duna" required>
+            </div>
+          </div>
+
+          <div class="field">
+            <label class="label">ISBN (Opcional)</label>
+            <div class="control">
+              <input class="input" type="text" name="isbn" placeholder="Ex: 978-8576570058">
+            </div>
+          </div>
+
+          <div class="field">
+            <label class="label">Capítulo ou Página</label>
+            <div class="control">
+              <input class="input" type="text" name="localizacao" placeholder="Ex: Página 42" required>
+            </div>
+          </div>
+
+          <div class="field">
+            <label class="label">Comentário</label>
+            <div class="control">
+              <textarea class="textarea" name="comentario" placeholder="Escreva seu comentário aqui..." required></textarea>
+            </div>
+          </div>
+
+          <div class="field">
+            <div class="control">
+              <button class="button is-primary" type="submit">Salvar Anotação</button>
+            </div>
+          </div>
+        </form>
+      </div>
+
+      <!-- Lista de Anotações Existentes -->
+      <div class="lista-anotacoes">
+        <h2 class="title is-4 mt-6">Anotações Salvas</h2>
+        {% if anotacoes %}
+          {% for anotacao in anotacoes %}
+          <div class="box">
+            <article class="media">
+              <div class="media-content">
+                <div class="content">
+                  <p>
+                    <strong>{{ anotacao.titulo_livro }}</strong> 
+                    <small class="has-text-grey-light">{{ anotacao.isbn if anotacao.isbn }}</small>
+                    <br>
+                    <small class="has-text-grey">Local: {{ anotacao.localizacao }}</small>
+                    <br>
+                    {{ anotacao.comentario }}
+                  </p>
+                </div>
+              </div>
+            </article>
+          </div>
+          {% endfor %}
+        {% else %}
+          <div class="notification is-info is-light">
+            Ainda não há nenhuma anotação. Adicione a sua primeira no formulário acima!
+          </div>
+        {% endif %}
+      </div>
+
+    </div>
+  </section>
+</body>
+</html>

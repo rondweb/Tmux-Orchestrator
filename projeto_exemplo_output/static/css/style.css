@@ -1,0 +1,9 @@
+/* Estilos personalizados para o projeto */
+
+body {
+    background-color: #f5f5f5;
+}
+
+.lista-anotacoes .box {
+    margin-bottom: 1.5rem;
+}

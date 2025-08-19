@@ -14,7 +14,7 @@ class TestLLMHandler(unittest.TestCase):
 
     def setUp(self):
         # Create a dummy config.yaml for testing
-        self.config_path = "/home/ubuntu/Tmux-Orchestrator/test_config.yaml"
+        self.config_path = "./test_config.yaml"
         self.test_api_key = "test_api_key_123"
         self.test_model_name = "test_model"
         self.test_base_url = "http://test.api.com"
